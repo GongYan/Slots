@@ -11,7 +11,7 @@ require "cocos.init"
 local function main()
     --初始化pbc    
     require("pbc.pbc")
-    
+    require("Utils")
 -- print "测试pbc"
 
 -- local msg_head = {msgtype = 1, msgname ="PbLogin.MsgLoginReq" , msgret = 0}
@@ -58,7 +58,7 @@ local port = 3000
 	net:connect(ip, port)
 	print("发送数据")
 	net:send("PbLogin.MsgLoginReq", {platform = 1, user_id = "sun"})
-
+	net:send("PbLogin.MsgLoginReq", {platform = 1, user_id = "Gong"})
     require("app.MyApp"):create():run()
 end
 
