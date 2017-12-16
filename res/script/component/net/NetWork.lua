@@ -149,7 +149,7 @@ function M:setIsStartGame(isStartGame)
 	self.isStartGame = isStartGame
 
 	--注册心跳
-	self:registerMsgListener("MsgHeart", self, self.onRcvHeartbeat)
+	self:registerMsgListener("MsgHeart", handler(self, self.onRcvHeartbeat))
 end
 
 -- start --
@@ -303,24 +303,6 @@ function M:processInput()
 	end
 end
 
--- start --
---------------------------------
--- @class function
--- @description 分发消息
--- @param msgTbl 消息表结构
--- end --
-function M:dispatchMessage(msgTbl)
-	local rcvMsgListener = self.rcvMsgListeners[msgTbl.user_id]
-
-	if rcvMsgListener then
-		if rcvMsgListener[2] and rcvMsgListener[1] then
-			rcvMsgListener[2](rcvMsgListener[1], msgTbl)
-		end
-	else
-		Utils.log("Could not handle Message " .. msgTbl.user_id)
-	end
-end
-
 function M:processOutput()
 	if self.sendTaskList and #self.sendTaskList > 0 then
 		local data = self.sendTaskList[#self.sendTaskList]
@@ -346,14 +328,67 @@ end
 -- start --
 --------------------------------
 -- @class function
--- @description 注册msgId消息回调
--- @param msgname 消息号
--- @param msgTarget
--- @param msgFunc 回调函数
+-- @description 分发消息
+-- @param msgTbl 消息表结构
 -- end --
-function M:registerMsgListener(msgname, msgTarget, msgFunc)
-	self.rcvMsgListeners[msgname] = {msgTarget, msgFunc}
+function M:dispatchMessage(msgTbl)
+
+	if self.rcvMsgListeners[msgTbl.user_id] == nil then
+		Utils.log("Could not handle Message " .. msgTbl.user_id)
+		return
+	end
+
+	for i = 1, #self.rcvMsgListeners[msgTbl.user_id] do
+		if self.rcvMsgListeners[msgTbl.user_id][i] then
+			self.rcvMsgListeners[msgTbl.user_id][i](msgTbl)
+		end
+	end
 end
+
+-- start --
+--------------------------------
+-- @class function
+-- @description 注册msgname消息回调
+-- @param msgname 消息号
+-- @param slot 回调函数
+-- end --
+function M:registerMsgListener(msgname, slot)
+
+	if self.rcvMsgListeners[msgname] == nil then
+		self.rcvMsgListeners[msgname] = {}
+	end
+
+	for i = 1, #self.rcvMsgListeners[msgname] do
+		if self.rcvMsgListeners[msgname][i] == slot then
+			return
+		end
+	end
+
+	self.rcvMsgListeners[msgname][#self.rcvMsgListeners[msgname] +1] = slot
+end
+
+-- start --
+--------------------------------
+-- @class function
+-- @description 注销msgname消息回调
+-- @param msgname 消息号
+-- @param slot 回调函数
+-- end --
+function M:unregisterMsgListener(msgname, slot)
+	if self.rcvMsgListeners[msgname] == nil then
+		Utils.log("unregisterMsgListener -> this message is no found")
+		return
+	end
+
+	for i = 1, #self.rcvMsgListeners[msgname] do
+		if self.rcvMsgListeners[msgname][i] == slot then
+			table.remove(self.rcvMsgListeners, i)
+			return
+		end
+	end
+	self.rcvMsgListeners[msgname] = nil
+end
+
 
 
 function M:luaToCByShort(value)
