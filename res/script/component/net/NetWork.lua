@@ -6,12 +6,33 @@ local M = cc.exports.NetWork
 local scheduler = cc.Director:getInstance():getScheduler() 
 
 function M:ctor()
+	self.rcvMsgListeners = {}
+	self:initData()
+end
+
+function M:initData()
 	self.isNetConnected = false --网络是否已链接
 	self.sendTaskList = {}
 	self.msgSize = 2 --包体总长度字节数
 	self.remainRecvSize = 2
 	self.recvingBuffer = ""
 	self.recvState = "Head"
+	--登录到服务器标识
+	self.isStartGame = false
+
+	--心跳消息重连时间
+	self.heatTime = 1
+	--心跳间隔
+	self.heartbeatCD = self.heatTime
+	--上一次时间间隔
+	self.lastReplayInterval = 0
+	--当前时间间隔
+	self.curReplayInterval = 0
+	--等待心跳时间
+	self.resumeHeartbeatTime = 8
+
+	--是否检测等心跳
+	self.isCheckNet = false
 end
 
 -- start --
@@ -54,9 +75,10 @@ function M:createScheduler()
 			self.isNetConnected = true
 			scheduler:unscheduleScriptEntry(self.scheduler_id)
 
-			self.precess_id = scheduler:scheduleScriptFunc(function ( ... )
-				self:processSocketIO()
-			end, 0.05, false)
+			self.precess_id = scheduler:scheduleScriptFunc(function (delta)
+				self:setIsStartGame(true) --开始游戏
+				self:processSocketIO(delta)
+			end, 0, false)
 		end
 	end
 	self.scheduler_id = scheduler:scheduleScriptFunc(checkConnect, 0.05, false)
@@ -75,8 +97,7 @@ function M:close()
 	if self.precess_id then
 		scheduler:unscheduleScriptEntry(self.precess_id)
 	end
-
-	self.isNetConnected = false
+	self:initData()
 end
 
 function M:isConnected()
@@ -92,12 +113,98 @@ function M:isConnected()
 	return false
 end
 
-function M:processSocketIO()
+function M:processSocketIO(delta)
 	if not self.isNetConnected then
 		return
 	end
+
+	if self.isStartGame then
+		if self.heartbeatCD >= 0 then
+			
+			--登陆服务器后开始发送心跳消息
+			self.heartbeatCD = self.heartbeatCD - delta
+			Utils.log("heartbeatCD->" .. self.heartbeatCD)
+			if self.heartbeatCD < 0 then
+				-- 发送心跳
+				self:sendHeartbeat(true)
+			end
+		else
+			--心跳回复时间间隔
+			self.curReplayInterval = self.curReplayInterval + delta
+			if self.isCheckNet and self.curReplayInterval >= self.resumeHeartbeatTime then
+				Utils.log("断线重连超时，重新登陆")
+				self.isCheckNet = false
+				self.heartbeatCD = self.heatTime
+				--心跳回复超时发送重新登录消息
+				self:reloginServer()
+			end
+		end
+	end
+
 	self:processInput()
 	self:processOutput()
+end
+
+function M:setIsStartGame(isStartGame)
+	self.isStartGame = isStartGame
+
+	--注册心跳
+	self:registerMsgListener("MsgHeart", self, self.onRcvHeartbeat)
+end
+
+-- start --
+--------------------------------
+-- @class function
+-- @description 服务器回复心跳
+-- @param msgTbl
+-- end --
+function M:onRcvHeartbeat(msgTbl)
+
+	self.lastReplayInterval = self.curReplayInterval
+	self.heartbeatCD = self.heatTime
+
+	Utils.log("Receive Heartbead")
+end
+
+function M:reloginServer()
+	--显示提示
+
+	--关闭链接
+	self:close()
+	--重新连接
+	self:connect(self.ip, self.port)
+
+	--请求服务器重新登陆
+	self:reLogin()
+end
+
+function M:relogin()
+	Utils.log("relogin")
+
+end
+
+-- start --
+--------------------------------
+-- @class function
+-- @description 向服务器发送心跳
+-- @param isCheckNet 检测和服务器的网络连接
+-- end --
+function M:sendHeartbeat(isCheckNet)
+	if not self.isStartGame then
+		return
+	end
+
+	if not self.closeHeartBeat then
+		self:send("PbLogin.MsgLoginReq", {platform = 1, user_id = "MsgHeart"})
+		self.sendHBTime = socket.gettime()
+	end
+
+	self.curReplayInterval = 0
+	self.isCheckNet = isCheckNet
+	if isCheckNet then
+		--防止重复发送心跳，直接进入等待回复状态
+		self.heartbeatCD = -1
+	end
 end
 
 function M:send(msgName, msgBody)
@@ -154,8 +261,9 @@ function M:receiveMessage(messageQueue)
 		local pbLen, pbHead, pbBody = string.unpack(self.recvingBuffer, ">PP")
 		local msgHead = protobuf.decode("PbHead.MsgHead", pbHead)
 		local msgBody = protobuf.decode(msgHead.msgname, pbBody)
-		Utils.log("收到服务器数据", msgHead.msgname)
+		table.insert(messageQueue, msgBody)
 
+		Utils.log("收到服务器数据", msgHead.msgname)
 		Utils.log("msgHead.msgtype " .. msgHead.msgtype .. "msgHead.msgname " ..msgHead.msgname .. "msgHead.msgret " ..msgHead.msgret)
 		Utils.log("---pbLen " .. pbLen)
 		Utils.log("msgBody.platform " .. msgBody.platform .. "msgBody.msgname " ..msgBody.user_id )
@@ -181,6 +289,7 @@ function M:processInput()
 	local messageQueue = {}
 	if not self:receiveMessage(messageQueue) then
 		--重新登录
+		self:reloginServer()
 		return
 	end
 
@@ -189,7 +298,27 @@ function M:processInput()
 	end
 
 	--分发数据出去
+	for i, v in ipairs(messageQueue) do
+		self:dispatchMessage(v)
+	end
+end
 
+-- start --
+--------------------------------
+-- @class function
+-- @description 分发消息
+-- @param msgTbl 消息表结构
+-- end --
+function M:dispatchMessage(msgTbl)
+	local rcvMsgListener = self.rcvMsgListeners[msgTbl.user_id]
+
+	if rcvMsgListener then
+		if rcvMsgListener[2] and rcvMsgListener[1] then
+			rcvMsgListener[2](rcvMsgListener[1], msgTbl)
+		end
+	else
+		Utils.log("Could not handle Message " .. msgTbl.user_id)
+	end
 end
 
 function M:processOutput()
@@ -214,7 +343,17 @@ function M:getInstance()
 	return self.instance
 end
 
-
+-- start --
+--------------------------------
+-- @class function
+-- @description 注册msgId消息回调
+-- @param msgname 消息号
+-- @param msgTarget
+-- @param msgFunc 回调函数
+-- end --
+function M:registerMsgListener(msgname, msgTarget, msgFunc)
+	self.rcvMsgListeners[msgname] = {msgTarget, msgFunc}
+end
 
 
 function M:luaToCByShort(value)
