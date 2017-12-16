@@ -1,10 +1,11 @@
 local Utils = cc.exports.Utils
-local NetWork = class("NetWork")
 
+cc.exports.NetWork = class("NetWork")
+local M = cc.exports.NetWork
 
 local scheduler = cc.Director:getInstance():getScheduler() 
 
-function NetWork:ctor()
+function M:ctor()
 	self.isNetConnected = false --网络是否已链接
 	self.sendTaskList = {}
 	self.msgSize = 2 --包体总长度字节数
@@ -22,7 +23,7 @@ end
 -- @param isBlock 是否阻塞
 -- @return socket链接创建是否成功
 -- end --
-function NetWork:connect(ip, port, isBlock)
+function M:connect(ip, port, isBlock)
 	self.ip = ip
 	self.port = port
 	local socket, errorInfo = socket.tcp()
@@ -46,7 +47,7 @@ function NetWork:connect(ip, port, isBlock)
 	end
 end
 
-function NetWork:createScheduler()
+function M:createScheduler()
 	local function checkConnect( dt )
 		--停止定时器
 		if self:isConnected() then
@@ -66,7 +67,7 @@ end
 -- @class function
 -- @description 关闭socket链接
 -- end --
-function NetWork:close()
+function M:close()
 	if self.socket then
 		self.socket:close()
 	end
@@ -78,7 +79,7 @@ function NetWork:close()
 	self.isNetConnected = false
 end
 
-function NetWork:isConnected()
+function M:isConnected()
 	local forWrite = {}
 	table.insert(forWrite, self.socket)
 	local readyForWrite, _;
@@ -91,7 +92,7 @@ function NetWork:isConnected()
 	return false
 end
 
-function NetWork:processSocketIO()
+function M:processSocketIO()
 	if not self.isNetConnected then
 		return
 	end
@@ -99,7 +100,7 @@ function NetWork:processSocketIO()
 	self:processOutput()
 end
 
-function NetWork:send(msgName, msgBody)
+function M:send(msgName, msgBody)
 	dump(msgBody, msgName)
 	--拼装
 	local msgHead = {msgtype = 1, msgname = msgName, msgret = 0}
@@ -115,7 +116,7 @@ function NetWork:send(msgName, msgBody)
 	table.insert(self.sendTaskList, 1, data)
 end
 
-function NetWork:receiveMessage(messageQueue)
+function M:receiveMessage(messageQueue)
 	if self.remainRecvSize <= 0 then
 		return true
 	end
@@ -169,7 +170,7 @@ function NetWork:receiveMessage(messageQueue)
 	return self:receiveMessage(messageQueue)
 end
 
-function NetWork:processInput()
+function M:processInput()
 	--检测是否有可读的socket
 	local recvt, sendt, status = socket.select({self.socket}, nil, 1)
 	Utils.log("input select", #recvt, sendt, status)
@@ -191,7 +192,7 @@ function NetWork:processInput()
 
 end
 
-function NetWork:processOutput()
+function M:processOutput()
 	if self.sendTaskList and #self.sendTaskList > 0 then
 		local data = self.sendTaskList[#self.sendTaskList]
 		if data then
@@ -206,9 +207,9 @@ function NetWork:processOutput()
 end
 
 
-function NetWork:getInstance()
+function M:getInstance()
 	if not self.instance then
-		self.instance = NetWork:new()
+		self.instance = M:new()
 	end
 	return self.instance
 end
@@ -216,11 +217,11 @@ end
 
 
 
-function NetWork:luaToCByShort(value)
+function M:luaToCByShort(value)
 	return string.char(value % 256) .. string.char(math.floor(value / 256))
 end
 
-function NetWork:luaToCByInt(value)
+function M:luaToCByInt(value)
 	local lowByte1 = string.char(math.floor(value / (256 * 256 * 256)))
 	local lowByte2 = string.char(math.floor(value / (256 * 256)) % 256)
 	local lowByte3 = string.char(math.floor(value / 256) % 256)
@@ -228,4 +229,3 @@ function NetWork:luaToCByInt(value)
 	return lowByte4 .. lowByte3 .. lowByte2 .. lowByte1
 end
 
-return NetWork

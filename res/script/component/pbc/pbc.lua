@@ -1,4 +1,4 @@
-require("pbc.protobuf")
+require("script.component.pbc.protobuf")
 
 protobuf.register_pb = function(filename)
     print("parse proto file:", filename)
