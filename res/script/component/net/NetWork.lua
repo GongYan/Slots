@@ -74,9 +74,9 @@ function M:createScheduler()
 		if self:isConnected() then
 			self.isNetConnected = true
 			scheduler:unscheduleScriptEntry(self.scheduler_id)
-
+			self:setIsStartGame(true) --开始游戏
+			
 			self.precess_id = scheduler:scheduleScriptFunc(function (delta)
-				self:setIsStartGame(true) --开始游戏
 				self:processSocketIO(delta)
 			end, 0, false)
 		end
@@ -195,7 +195,7 @@ function M:sendHeartbeat(isCheckNet)
 	end
 
 	if not self.closeHeartBeat then
-		self:send("PbLogin.MsgLoginReq", {platform = 1, user_id = "MsgHeart"})
+		self:send("PbHead.MsgHeartbeatReq", {user_id = "MsgHeart"})
 		self.sendHBTime = socket.gettime()
 	end
 
@@ -264,9 +264,7 @@ function M:receiveMessage(messageQueue)
 		table.insert(messageQueue, msgBody)
 
 		Utils.log("收到服务器数据", msgHead.msgname)
-		Utils.log("msgHead.msgtype " .. msgHead.msgtype .. "msgHead.msgname " ..msgHead.msgname .. "msgHead.msgret " ..msgHead.msgret)
-		Utils.log("---pbLen " .. pbLen)
-		Utils.log("msgBody.platform " .. msgBody.platform .. "msgBody.msgname " ..msgBody.user_id )
+		dump(msgBody, "msgBody")
 		Utils.log("---------end------------")
 
 		self.remainRecvSize = self.msgSize
@@ -363,7 +361,6 @@ function M:registerMsgListener(msgname, slot)
 			return
 		end
 	end
-
 	self.rcvMsgListeners[msgname][#self.rcvMsgListeners[msgname] +1] = slot
 end
 
