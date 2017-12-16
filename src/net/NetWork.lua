@@ -7,6 +7,10 @@ local scheduler = cc.Director:getInstance():getScheduler()
 function NetWork:ctor()
 	self.isNetConnected = false --网络是否已链接
 	self.sendTaskList = {}
+	self.msgSize = 2 --包体总长度字节数
+	self.remainRecvSize = 2
+	self.recvingBuffer = ""
+	self.recvState = "Head"
 end
 
 -- start --
@@ -95,34 +99,96 @@ function NetWork:processSocketIO()
 	self:processOutput()
 end
 
-function NetWork:processInput()
-	--检测是否有可读的socket
-	local recvt, sendt, status = socket.select({self.socket}, nil, 1)
-	Utils.log("input", #recvt, sendt, status)
-	if #recvt <= 0 then
-		return
+function NetWork:send(msgName, msgBody)
+	dump(msgBody, msgName)
+	--拼装
+	local msgHead = {msgtype = 1, msgname = msgName, msgret = 0}
+	local pbHead = protobuf.encode("PbHead.MsgHead", msgHead)
+	local pbBody = protobuf.encode(msgName, msgBody)
+
+	local headPack = string.pack(">P", pbHead)
+	local bodyPack = string.pack(">P", pbBody)
+	local msgLen = string.len(headPack) + string.len(bodyPack)
+	local lenPack = string.pack(">H", msgLen)
+	Utils.log("GameNet send msg:"..msgName .. ": headPackLen:" .. #headPack .. ": bodyPackLen: " .. #bodyPack)
+	local data = lenPack .. headPack ..bodyPack
+	table.insert(self.sendTaskList, 1, data)
+end
+
+function NetWork:receiveMessage(messageQueue)
+	if self.remainRecvSize <= 0 then
+		return true
 	end
 
-	--先接收两个字节计算包长度
-	local recvContent, errorInfo, otherContent = self.socket:receive(2)
-	if recvContent then
-		--计算包的长度
-		local first, second = string.byte(recvContent, 1, 2)
-		local len = first * 256 + second --通过位计算长度
-		Utils.log("收到数据长度=",len)
+	local recvContent, errorInfo, otherContent = self.socket:receive(self.remainRecvSize)
+	if errorInfo ~= nil then
+		if errorInfo == "timeout" then --由于timeout为0并且为异步socket，不能认为socket出错
+			if otherContent ~= nil and #otherContent > 0 then
+				self.recvingBuffer = self.recvingBuffer .. otherContent
+				self.remainRecvSize = self.remainRecvSize - #otherContent
+				Utils.log("recv timeout, but had other content. size:" .. #otherContent)
+			end
+			return true
+		else --发生错误，这个点可以考虑重连了，不用等待heartbeat
+			Utils.log("recv failed errorinf: " .. errorInfo)
+			return false
+		end
+	end
 
-		--接收整个数据
-		local recvContent, errorInfo, otherContent = self.socket:receive(len)
+	local contentSize = #recvContent
+	self.recvingBuffer = self.recvingBuffer .. recvContent
+	self.remainRecvSize = self.remainRecvSize - contentSize
 
+	if self.remainRecvSize > 0 then --等待下次接收
+		return true
+	end
+
+	if self.recvState == "Head" then
+		local first, second = string.byte(self.recvingBuffer, 1,2)
+		self.remainRecvSize = first * 256 + second --通过位计算长度
+		self.recvingBuffer = ""
+		self.recvState = "Body"
+	elseif self.recvState == "Body" then
 		--解析包
-		local pbLen, pbHead, pbBody, t = string.unpack(recvContent, ">PPb")
+		local pbLen, pbHead, pbBody = string.unpack(self.recvingBuffer, ">PP")
 		local msgHead = protobuf.decode("PbHead.MsgHead", pbHead)
 		local msgBody = protobuf.decode(msgHead.msgname, pbBody)
 		Utils.log("收到服务器数据", msgHead.msgname)
 
 		Utils.log("msgHead.msgtype " .. msgHead.msgtype .. "msgHead.msgname " ..msgHead.msgname .. "msgHead.msgret " ..msgHead.msgret)
+		Utils.log("---pbLen " .. pbLen)
 		Utils.log("msgBody.platform " .. msgBody.platform .. "msgBody.msgname " ..msgBody.user_id )
+		Utils.log("---------end------------")
+
+		self.remainRecvSize = self.msgSize
+		self.recvingBuffer = ""
+		self.recvState = "Head"
 	end
+
+	--继续接数据包 如果有大量网络包发送给客户端可能会有掉帧现象，但目前不需要考虑，解决方案可以1.设定总接收时间2.收完body包就不在继续接收了
+	return self:receiveMessage(messageQueue)
+end
+
+function NetWork:processInput()
+	--检测是否有可读的socket
+	local recvt, sendt, status = socket.select({self.socket}, nil, 1)
+	Utils.log("input select", #recvt, sendt, status)
+	if #recvt <= 0 then
+		return
+	end
+
+	local messageQueue = {}
+	if not self:receiveMessage(messageQueue) then
+		--重新登录
+		return
+	end
+
+	if #messageQueue <= 0 then
+		return
+	end
+
+	--分发数据出去
+
 end
 
 function NetWork:processOutput()
@@ -148,20 +214,18 @@ function NetWork:getInstance()
 end
 
 
-function NetWork:send(msgName, msgBody)
-	dump(msgBody, msgName)
-	--拼装头
-	local msgHead = {msgtype = 1, msgname = msgName, msgret = 0}
-	local pbHead = protobuf.encode("PbHead.MsgHead", msgHead)
-	local pbBody = protobuf.encode(msgName, msgBody)
-	--计算长度
-	local pbHeadLen = #pbHead
-	local pbBodyLen = #pbBody
-	local pbLen = 2 + pbHeadLen + 2 + pbBodyLen + 1
 
-	local data = string.pack(">HPPb", pbLen, pbHead, pbBody, string.byte("t"))
-	Utils.log("GameNet send msg:"..msgName..":"..string.char(string.byte('t')))
-	table.insert(self.sendTaskList, 1, data)
+
+function NetWork:luaToCByShort(value)
+	return string.char(value % 256) .. string.char(math.floor(value / 256))
+end
+
+function NetWork:luaToCByInt(value)
+	local lowByte1 = string.char(math.floor(value / (256 * 256 * 256)))
+	local lowByte2 = string.char(math.floor(value / (256 * 256)) % 256)
+	local lowByte3 = string.char(math.floor(value / 256) % 256)
+	local lowByte4 = string.char(value % 256)
+	return lowByte4 .. lowByte3 .. lowByte2 .. lowByte1
 end
 
 return NetWork
