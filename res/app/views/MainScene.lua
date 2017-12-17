@@ -1,11 +1,15 @@
-
+local Utils = cc.exports.Utils
 local MainScene = class("MainScene", cc.load("mvc").ViewBase)
 
 function MainScene:onCreate()
-    -- add background image
-    display.newSprite("HelloWorld.png")
-        :move(display.center)
-        :addTo(self)
+
+
+    local spr =  cc.Sprite:create("HelloWorld.png")
+    spr:setPosition(display.center)
+    self:addChild(spr)
+
+    Utils.customShader(spr, "script/component/shader/gray")
+
 
     -- add HelloWorld label
     cc.Label:createWithSystemFont("Hello World", "Arial", 40)
