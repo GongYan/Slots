@@ -8,7 +8,7 @@ function MainScene:onCreate()
     spr:setPosition(display.center)
     self:addChild(spr)
 
-    Utils.customShader(spr, "script/component/shader/gray")
+    Utils.customShader(spr, "script/component/shader/Twish")
 
 
     -- add HelloWorld label
