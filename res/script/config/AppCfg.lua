@@ -1,0 +1,7 @@
+local AppCfg = {
+	LOGIN = "LOGIN",
+	USER_LOGIN_SUCCESS = "USER_LOGIN_SUCCESS",
+	USER_LOGIN_FAILED = "USER_LOGIN_FAILED",
+
+}
+return AppCfg

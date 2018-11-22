@@ -5,12 +5,11 @@ local Notification = require("script.framework.puremvc.patterns.observer.Notific
 
 ---------------------------
 --@module script.framework.puremvc.patterns.facade.Facade
-Facade = class("Facade");
+local Facade = class("Facade");
 
 Facade.instance = nil;
 
 Facade.SINGLETON_MSG = "Facade Singleton already constructed!";
-
 
 ---------------------------
 --@function [parent=#Facade] ctor
@@ -26,7 +25,6 @@ function Facade:ctor()
     Facade.instance = self;
 end
 
-
 ---------------------------
 --
 --@function [parent=#org.puremvc.patterns.facade.Facade] initializeFacade
@@ -36,7 +34,6 @@ function Facade:initializeFacade()
     self:initializeController();
     self:initializeView();
 end
-
 
 ---------------------------
 --@function [parent=#Facade] getInstance
@@ -49,7 +46,6 @@ function Facade:getInstance()
     return Facade.instance;
 end
 
-
 ---------------------------
 --@function [parent=#Facade] initializeController
 -- @param self Facade
@@ -61,7 +57,6 @@ function Facade:initializeController()
     self.controller = Controller:getInstance();
     print(self.controller);
 end
-
 
 ---------------------------
 --@function [parent=#Facade] initializeModel
@@ -86,11 +81,6 @@ function Facade:initializeView()
     self.view = View:getInstance();
     print(self.view);
 end
-
-
-
-
-
 
 ---------------------------
 --@function [parent=#Facade] registerCommand
@@ -117,12 +107,6 @@ end
 function Facade:hasCommand(notificationName)
     return self.controller:hasCommand( notificationName );
 end
-
-
-
-
-
-
 
 ---------------------------
 --@function [parent=#Facade] registerProxy
@@ -167,11 +151,6 @@ function Facade:hasProxy(proxyName)
     return self.model:hasProxy( proxyName );
 end
 
-
-
-
-
-
 ---------------------------
 --@param #Mediator mediator
 function Facade:registerMediator(mediator)
@@ -204,13 +183,6 @@ end
 function Facade:hasMediator(mediatorName)
     return self.view:hasMediator( mediatorName );
 end
-
-
-
-
-
-
-
 
 ---------------------------
 --@param notificationName String 

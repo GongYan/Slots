@@ -31,7 +31,7 @@ end
 --@function [parent=#src.org.puremvc.patterns.observer.Notifier] ctor
 --@param self Notifier 
 function Notifier:ctor()
-	self.facade = Facade:getInstance();
+	self.facade = AppFacade
 end
 
 return Notifier;

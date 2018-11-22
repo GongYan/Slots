@@ -1,13 +1,6 @@
+
 local GameClient = class("GameClient")
 local M = GameClient
-
---do some initial for your game
-local function init()
-	require("script.util.Utils")
-    --初始化pbc    
-    require("script.component.pbc.pbc")
-    require("script.component.net.NetWork")
-end
 
 --create first scene of your game
 local function createScene()
@@ -24,12 +17,13 @@ local function createScene()
 	-- 	idx = idx * 10
 	-- end
 	
-    require("app.MyApp"):create():run()
+	local loginScene = require("script.game.login.LoginScene"):create()
+	cc.Director:getInstance():replaceScene(loginScene)
 end
 
 --game client start...
 function M:start()
-	init()
+	require("script.init")
 	createScene()
 end
 

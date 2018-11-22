@@ -1,5 +1,4 @@
-cc.exports.Utils = cc.exports.Utils or {}
-local Utils = cc.exports.Utils
+local Utils = {}
 local function log(msg, ...)
 
 	msg = msg .. " "
@@ -26,3 +25,26 @@ local function customShader(node, shaderPath )
 		node:setGLProgram(pProgram)
 end
 Utils.customShader = customShader
+
+local function deepCopy(object)
+    local lookup_table = {}
+    local function _copy(object)
+        if type(object) ~= "table" then
+            return object
+        elseif lookup_table[object] then
+            return lookup_table[object]
+        end
+
+        local new_table = {}
+        lookup_table[object] = new_table
+        for key, value in pairs(object) do
+            new_table[_copy(key)] = _copy(value)
+        end
+        return setmetatable(new_table, getmetatable(object))
+    end
+
+    return _copy(object)
+end
+Utils.deepCopy = deepCopy
+
+return Utils

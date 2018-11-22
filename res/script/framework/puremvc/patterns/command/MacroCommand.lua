@@ -4,16 +4,14 @@ local Notifier = require("script.framework.puremvc.patterns.observer.Notifier");
 --@module MacroCommand
 local MacroCommand = class("MacroCommand", Notifier);
 
-
 ---------------------------
---@function [parent=#MacroCommand] execute
+--@function [parent=#MacroCommand] ctor
 --@param self MacroCommand
---@param #Notification notification
-function MacroCommand:execute(notification)
+function MacroCommand:ctor()
+    MacroCommand.super.ctor(self);
     self.subCommands = {};
-    self:initializeMacroCommand();   
+    self:initializeMacroCommand();      
 end
-
 
 ---------------------------
 --@function [parent=#MacroCommand] initializeMacroCommand
@@ -46,14 +44,6 @@ function MacroCommand:execute(notification)
         table.remove(self.subCommands, 1);
         commandInstance:execute(notification);
     end
-end
-
-
----------------------------
---@function [parent=#MacroCommand] ctor
---@param self MacroCommand
-function MacroCommand:ctor()
-    MacroCommand.super.ctor(self);
 end
 
 return MacroCommand;
