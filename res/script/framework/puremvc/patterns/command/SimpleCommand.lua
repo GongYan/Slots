@@ -1,4 +1,4 @@
-local Notifier = require("script.framework.puremvc.patterns.observer.Notifier");
+local Notifier = FILE.Notifier
 
 ---
 -- 

@@ -1,5 +1,13 @@
 local Event = class("Event")
 Event.eventsListener = {}
+
+function Event:getInstance()
+    if (Event.instance == nil) then
+        Event.instance = Event:create( ) 
+    end
+    return Event.instance;
+end
+
 -- start --
 --------------------------------
 -- @class function registerEventListener

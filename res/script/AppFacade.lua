@@ -1,8 +1,5 @@
 
-local Facade = require("script.framework.puremvc.patterns.facade.Facade")
-local StartupCommand = require("script.game.StartupCommand")
-
-local AppFacade = class("AppFacade", Facade)
+local AppFacade = class("AppFacade", FILE.Facade)
 AppFacade.STARTUP = "startup"
 
 function AppFacade:getInstance()
@@ -14,11 +11,11 @@ end
 
 function AppFacade:initializeController()
 	AppFacade.super.initializeController(self)
-	self:registerCommand(AppFacade.STARTUP, StartupCommand)
+	self:registerCommand(AppFacade.STARTUP, FILE.StartupCommand)
 end
 
-function AppFacade:startUp(rootView)
-	self:sendNotification(AppFacade.STARTUP,  rootView )
+function AppFacade:startUp()
+	self:sendNotification(AppFacade.STARTUP)
 	self:removeCommand(AppFacade.STARTUP)
 end
 

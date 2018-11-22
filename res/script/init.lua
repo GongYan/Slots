@@ -3,11 +3,15 @@
 cc.exports.EventCfg = require("script.config.EventCfg")
 cc.exports.MsgCfg = require("script.config.MsgCfg")
 cc.exports.AppCfg = require("script.config.AppCfg")
+cc.exports.SceneCfg = require("script.config.SceneCfg")
 
 --framework
-cc.exports.Event = require("script.framework.event.Event"):create()
 cc.exports.Utils = require("script.util.Utils")
-cc.exports.AppFacade = require("script.AppFacade"):getInstance()
+cc.exports.FILE = require("script.config.FileCfg")
+
+cc.exports.Event = FILE.Event:getInstance()
+cc.exports.AppFacade = FILE.AppFacade:getInstance()
+
 
 --net pbc    
 require("script.component.pbc.pbc")

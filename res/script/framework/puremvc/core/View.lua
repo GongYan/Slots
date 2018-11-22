@@ -1,5 +1,5 @@
 
-local Observer = require("script.framework.puremvc.patterns.observer.Observer");
+local Observer = FILE.Observer
 ---------------------------
 --@module org.puremvc.core.View
 local View = class("View");

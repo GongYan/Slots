@@ -1,5 +1,5 @@
-local View = require("script.framework.puremvc.core.View");
-local Observer = require("script.framework.puremvc.patterns.observer.Observer");
+local View = FILE.View
+local Observer = FILE.Observer
 ---------------------------
 --@module org.puremvc.core.Controller
 local Controller = class("Controller");

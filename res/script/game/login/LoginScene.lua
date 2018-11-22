@@ -1,9 +1,8 @@
-local BaseScene = require("script.framework.baseui.BaseScene");
-local LoginScene = class("LoginScene", BaseScene)
+
+local LoginScene = class("LoginScene", FILE.BaseScene)
 
 function LoginScene:ctor()
 	LoginScene.super.ctor(self)
-	AppFacade:startUp(self)
 	Event.dispatchEvent(EventCfg.ON_LOGIN, {username = 'test', password = "test"})
 end
 

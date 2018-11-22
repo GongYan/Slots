@@ -1,7 +1,7 @@
-local Model = require("script.framework.puremvc.core.Model");
-local Controller = require("script.framework.puremvc.core.Controller");
-local View = require("script.framework.puremvc.core.View");
-local Notification = require("script.framework.puremvc.patterns.observer.Notification");
+local Model = FILE.Model
+local Controller = FILE.Controller
+local View = FILE.View
+local Notification = FILE.Notification
 
 ---------------------------
 --@module script.framework.puremvc.patterns.facade.Facade

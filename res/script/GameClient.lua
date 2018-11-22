@@ -17,14 +17,14 @@ local function createScene()
 	-- 	idx = idx * 10
 	-- end
 	
-	local loginScene = require("script.game.login.LoginScene"):create()
-	cc.Director:getInstance():replaceScene(loginScene)
+	-- local loginScene = require("script.game.login.LoginScene"):create()
+	-- cc.Director:getInstance():replaceScene(loginScene)
 end
 
 --game client start...
 function M:start()
 	require("script.init")
-	createScene()
+	AppFacade:startUp()
 end
 
 function M:gameEnd()
