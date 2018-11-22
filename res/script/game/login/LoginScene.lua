@@ -1,7 +1,8 @@
-
-local LoginScene = class("LoginScene", cc.Scene)
+local BaseScene = require("script.framework.baseui.BaseScene");
+local LoginScene = class("LoginScene", BaseScene)
 
 function LoginScene:ctor()
+	LoginScene.super.ctor(self)
 	AppFacade:startUp(self)
 	Event.dispatchEvent(EventCfg.ON_LOGIN, {username = 'test', password = "test"})
 end
@@ -14,6 +15,10 @@ end
 
 function LoginScene:displayLoginError()
     print("can not login to server")
+end
+
+function LoginScene:onExit()
+
 end
 
 return LoginScene

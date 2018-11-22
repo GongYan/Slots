@@ -1,4 +1,4 @@
-local Event = {}
+local Event = class("Event")
 Event.eventsListener = {}
 -- start --
 --------------------------------
@@ -10,7 +10,7 @@ Event.eventsListener = {}
 -- @return
 -- gt6.registerEventListener(2, self, self.eventLis)
 -- end --
-local function registerEventListener(eventType, target, method)
+function Event:registerEventListener(eventType, target, method)
 	if not eventType or not target or not method then
 		return
 	end
@@ -35,7 +35,6 @@ local function registerEventListener(eventType, target, method)
 	local listener = {target, method}
 	table.insert(listeners, listener)
 end
-Event.registerEventListener = registerEventListener
 
 -- start --
 --------------------------------
@@ -45,7 +44,7 @@ Event.registerEventListener = registerEventListener
 -- @param ... 调用者传递的参数
 -- @return
 -- end --
-local function dispatchEvent(eventType, ...)
+function Event:dispatchEvent(eventType, ...)
 	if not eventType or not gt6 then
 		return 
 	end
@@ -68,7 +67,6 @@ local function dispatchEvent(eventType, ...)
 	end
 	
 end
-Event.dispatchEvent = dispatchEvent
 
 -- start --
 --------------------------------
@@ -78,7 +76,7 @@ Event.dispatchEvent = dispatchEvent
 -- @param eventType 消息类型
 -- @return
 -- end --
-local function removeTargetEventListenerByType(target, eventType,isSocketMsg)
+function Event:removeTargetEventListenerByType(target, eventType,isSocketMsg)
 	if not target or not eventType then
 		return
 	end
@@ -96,7 +94,6 @@ local function removeTargetEventListenerByType(target, eventType,isSocketMsg)
 		end
 	end
 end
-Event.removeTargetEventListenerByType = removeTargetEventListenerByType
 
 -- start --
 --------------------------------
@@ -105,7 +102,7 @@ Event.removeTargetEventListenerByType = removeTargetEventListenerByType
 -- @param target self
 -- @return
 -- end --
-local function removeTargetAllEventListener(target)
+function Event:removeTargetAllEventListener(target)
 	if not target then
 		return
 	end
@@ -120,7 +117,6 @@ local function removeTargetAllEventListener(target)
 		end
 	end
 end
-Event.removeTargetAllEventListener = removeTargetAllEventListener
 
 -- start --
 --------------------------------
@@ -128,7 +124,8 @@ Event.removeTargetAllEventListener = removeTargetAllEventListener
 -- @description 移除全部消息注册回调
 -- @return
 -- end --
-local function removeAllEventListener()
+function Event:removeAllEventListener()
 	Event.eventsListener = {}
 end
-Event.removeAllEventListener = removeAllEventListener
+
+return Event

@@ -9,7 +9,7 @@ function StartupCommand:execute(notification)
 
 	AppFacade:registerProxy(ServerProxy:create())
 	local rootView = notification:getBody()
-	AppFacade:registerMediator( LoginMediator:create(rootView) )
+	AppFacade:registerMediator( LoginMediator:create("LoginMediator", rootView) )
 end
 
 

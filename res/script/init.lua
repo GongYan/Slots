@@ -5,7 +5,7 @@ cc.exports.MsgCfg = require("script.config.MsgCfg")
 cc.exports.AppCfg = require("script.config.AppCfg")
 
 --framework
-cc.exports.Event = require("script.framework.event.Event")
+cc.exports.Event = require("script.framework.event.Event"):create()
 cc.exports.Utils = require("script.util.Utils")
 cc.exports.AppFacade = require("script.AppFacade"):getInstance()
 

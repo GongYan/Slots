@@ -4,17 +4,19 @@ local LoginMediator = class("LoginMediator", Mediator)
 
 function LoginMediator:onRegister()
 	
-	Event.registerEventListener(EventCfg.ON_LOGIN, self.viewComponent, function(eventType, data )
+	Event:registerEventListener(EventCfg.ON_LOGIN, self.viewComponent, function(eventType, data )
 		self:sendNotification(AppCfg.LOGIN ,data)
 	end )
 
-	Event.registerEventListener(EventCfg.ON_SERVER, self.viewComponent, function(eventType, data )
+	Event:registerEventListener(EventCfg.ON_SERVER, self.viewComponent, function(eventType, data )
 		self:sendNotification(AppCfg.LOGIN ,data)
 	end )	
+
+	
 end
 
 function LoginMediator:onRemove()
-	Event.removeTargetAllEventListener(self.viewComponent)
+	Event:removeTargetAllEventListener(self.viewComponent)
 end
 
 function LoginMediator:handleNotification(note)
