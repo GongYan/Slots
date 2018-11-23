@@ -1,14 +1,18 @@
 
-local SimpleCommand = require("script.framework.puremvc.patterns.command.SimpleCommand");
-local DirectorMediator = require("script.game.DirectorMediator")
-local ServerProxy = require("script.game.login.ServerProxy")
-local StartupCommand = class("StartupCommand", SimpleCommand)
+local StartupCommand = class("StartupCommand", FILE.SimpleCommand)
 
 function StartupCommand:execute(notification)
-	-- AppFacade:registerCommand(AppCfg.xxx, xxxcomman)
+	--命令
+	self.facade:registerCommand(AppCfg.LOAD_LAYERS, FILE.LoadLayersCommand)
+	self.facade:registerCommand(AppCfg.LOAD_SCENE, FILE.LoadSceneCommand)
+	self.facade:registerCommand(AppCfg.REMOVE_LAYERS, FILE.RemoveLayersCommand)
+	self.facade:registerCommand(AppCfg.GO_BACK, FILE.BackSceneCommand)
 
-	AppFacade:registerProxy(ServerProxy:create())
-	AppFacade:registerMediator( DirectorMediator:create("DirectorMediator") )
+	--代理
+	self.facade:registerProxy(FILE.ContextProxy:create({}))
+
+	--中介者
+	self.facade:registerMediator( FILE.GameMediator:create() )
 end
 
 

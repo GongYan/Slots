@@ -5,17 +5,12 @@ local Notifier = FILE.Notifier
 --@module org.puremvc.patterns.mediator.Mediator
 local Mediator = class("Mediator", Notifier);
 
-Mediator.NAME = "Mediator";
-
-
 ---------------------------
 --@function [parent=#Mediator] ctor
 --@param self Facade
---@param mediatorName String 
 --@param viewComponent Ref
-function Mediator:ctor(mediatorName, viewComponent)
+function Mediator:ctor(viewComponent)
     Mediator.super.ctor(self);
-    self.mediatorName = (mediatorName ~= nil and mediatorName) or self.NAME; 
     self.viewComponent = viewComponent; 
 end
 
@@ -25,7 +20,7 @@ end
 --@param self Facade
 --@return #String
 function Mediator:getMediatorName()   
-    return self.mediatorName;
+    return self.__cname;
 end
 
 ---------------------------

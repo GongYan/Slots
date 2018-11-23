@@ -6,18 +6,13 @@ local Notifier = FILE.Notifier
 --@module Proxy
 local Proxy = class("Proxy", Notifier);
 
----
---@field [parent=#Proxy] #string NAME 代理名称。
-Proxy.NAME = "Proxy";
-
 ---------------------------
 --@function [parent=#Proxy] ctor
 -- @param self Proxy
 --@param #string proxyName
 --@param #Ref data 
-function Proxy:ctor(proxyName, data)
+function Proxy:ctor(data)
     Proxy.super.ctor(self);
-	self.proxyName = ((proxyName ~= nil and proxyName) or self.NAME); 
 	self.data = nil;
     if (data ~= nil) then 
         self:setData(data); 
@@ -30,7 +25,7 @@ end
 --@param self Proxy
 --@return #string
 function Proxy:getProxyName()
-	return self.proxyName;
+	return self.__cname;
 end
 
 ---------------------------

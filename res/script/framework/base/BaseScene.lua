@@ -20,6 +20,7 @@ function BaseScene:onNodeEvent(eventName)
 end
 
 function BaseScene:onEnter()
+	Event.dispatchEvent(EventCfg.DID_ENTER, self)
 end
 
 function BaseScene:onEnterTransitionFinish()

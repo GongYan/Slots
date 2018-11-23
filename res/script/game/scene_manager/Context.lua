@@ -31,4 +31,11 @@ function Context:removeChild(context)
 	return nil
 end
 
+function Context:extendData( extend_data )
+	if not extend_data or not next(extend_data) then return end
+	for k, v in pairs(extend_data) do
+		self.data[k] = v
+	end
+end
+
 return Context
