@@ -1,8 +1,10 @@
 local Context = class("Context")
 
 function Context:ctor(data)
-	self.mediatorClass = data.mediatorClass
-	self.viewComponentClass = data.viewComponentClass
+	if data then
+		self.mediatorClass = data.mediatorClass
+		self.viewComponentClass = data.viewComponentClass
+	end
 	self.data = {}
 	self.parent = nil
 	self.children = {}

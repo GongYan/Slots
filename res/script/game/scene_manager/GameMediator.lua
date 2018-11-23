@@ -17,20 +17,14 @@ function GameMediator:handleNotification(notification)
 
     if name == AppCfg.GO_TO_SCENE then
     	local scene_type = notification:getType()
-    	if scene_type == SceneCfg.LOGIN then
-    		context.mediatorClass = FILE.LoginMediator
-    		context.viewComponentClass = FILE.LoginScene
-    	end
+        for index, value in ipairs(SceneCfg) do
+            if scene_type and index and value and index == scene_type then
+                context.mediatorClass = value.Mediator
+                context.viewComponentClass = value.Scene
+            end
+        end
     end
     self:sendNotification(AppCfg.LOAD_SCENE, context)
-end
-
-function GameMediator:onRegister()
-	
-end
-
-function GameMediator:onRemove()
-	
 end
 
 return GameMediator

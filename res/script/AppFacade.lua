@@ -17,6 +17,8 @@ end
 function AppFacade:startUp()
 	self:sendNotification(AppFacade.STARTUP)
 	self:removeCommand(AppFacade.STARTUP)
+
+	self:sendNotification(AppFacade.GO_TO_SCENE, {}, SceneCfg.LOGIN ) --去登陆场景
 end
 
 

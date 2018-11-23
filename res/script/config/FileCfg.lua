@@ -16,11 +16,20 @@ local FileCfg = {
 	BaseLayer = require("script.framework.base.BaseLayer"),
 
 	Event = require("script.framework.event.Event"),
-	--game
+	--scene manager 
 	StartupCommand = require("script.game.StartupCommand"),
+	Context = require("script.game.scene_manager.Context"),
+	ContextProxy = require("script.game.scene_manager.ContextProxy"),
+	LoadLayersCommand = require("script.game.scene_manager.LoadLayersCommand"),
+	LoadSceneCommand = require("script.game.scene_manager.LoadSceneCommand"),
+	RemoveLayersCommand = require("script.game.scene_manager.RemoveLayersCommand"),
+	BackSceneCommand = require("script.game.scene_manager.BackSceneCommand"),
+	GameMediator = require("script.game.scene_manager.GameMediator"),
+
+	--center manager
 	AppFacade = require("script.AppFacade"),
+	--game
 	LoginMediator = require("script.game.login.LoginMediator"),
 	LoginScene = require("script.game.login.LoginScene"),
-	Context = require("script.game.scene_manager.Context"),
 }
 return FileCfg
