@@ -38,4 +38,14 @@ function Context:extendData( extend_data )
 	end
 end
 
+function Context:getContextByMediatorName( mediatorName )
+	if not mediatorName or mediatorName == "" then return end
+	for _, context in ipairs(self.children) do
+		if context.mediatorClass.__name == mediatorName then
+			return context
+		end
+	end
+	return nil
+end
+
 return Context
