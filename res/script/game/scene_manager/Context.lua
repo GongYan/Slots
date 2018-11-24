@@ -3,7 +3,7 @@ local Context = class("Context")
 function Context:ctor(data)
 	if data then
 		self.mediatorClass = data.mediatorClass
-		self.viewComponentClass = data.viewComponentClass
+		self.viewClass = data.viewClass
 	end
 	self.data = {}
 	self.parent = nil

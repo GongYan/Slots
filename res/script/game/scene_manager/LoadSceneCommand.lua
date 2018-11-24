@@ -35,7 +35,7 @@ function LoadSceneCommand:execute(notification)
 
     local prevContext = body.prevContext or contextProxy:getCurrentContext()
     local function onRemoved()
-        self.facade:removeMediator(prevContext.mediator.__cname)
+        self.facade:removeMediator(prevContext.mediatorClass.__cname)
         nextScene()
     end
     

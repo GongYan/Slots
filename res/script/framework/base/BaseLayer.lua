@@ -20,6 +20,7 @@ function BaseLayer:onNodeEvent(eventName)
 end
 
 function BaseLayer:onEnter()
+	Event:dispatchEvent(EventCfg.LAYER_ENTER, self)
 end
 
 function BaseLayer:onEnterTransitionFinish()

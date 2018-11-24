@@ -16,7 +16,7 @@ end
 -- @param target 实例
 -- @param method 方法
 -- @return
--- gt6.registerEventListener(2, self, self.eventLis)
+-- registerEventListener(2, self, self.eventLis)
 -- end --
 function Event:registerEventListener(eventType, target, method)
 	if not eventType or not target or not method then
@@ -53,7 +53,7 @@ end
 -- @return
 -- end --
 function Event:dispatchEvent(eventType, ...)
-	if not eventType or not gt6 then
+	if not eventType then
 		return 
 	end
 	local listeners = Event.eventsListener[eventType] or {}
@@ -70,7 +70,7 @@ function Event:dispatchEvent(eventType, ...)
 		end
 	else
 		-- 没有注册的消息也打印 方便调试
-		print("gt6.ispatchEvent---->>>Could not handle Message " .. tostring(eventType))
+		print("ispatchEvent---->>>Could not handle Message " .. tostring(eventType))
 		return "ERROR_NO_HANDLE"
 	end
 	

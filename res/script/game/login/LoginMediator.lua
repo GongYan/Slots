@@ -2,7 +2,6 @@
 local LoginMediator = class("LoginMediator", FILE.Mediator)
 
 function LoginMediator:onRegister()
-	self.viewComponent = require("script.game.login.LoginScene"):create()
 
 	Event:registerEventListener(EventCfg.ON_LOGIN, self.viewComponent, function(eventType, data )
 		self:sendNotification(AppCfg.LOGIN ,data)
@@ -10,9 +9,7 @@ function LoginMediator:onRegister()
 
 	Event:registerEventListener(EventCfg.ON_SERVER, self.viewComponent, function(eventType, data )
 		self:sendNotification(AppCfg.LOGIN ,data)
-	end )	
-
-	cc.Director:getInstance():replaceScene(self.viewComponent)	
+	end )
 end
 
 function LoginMediator:onRemove()
