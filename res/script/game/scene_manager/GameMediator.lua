@@ -1,5 +1,5 @@
 
-local GameMediator = class("GameMediator", FILE.Mediator)
+local GameMediator = class("GameMediator", FILE.BaseMediator)
 
 function GameMediator:listNotificationInterests()
 	return { AppCfg.GO_TO_SCENE };

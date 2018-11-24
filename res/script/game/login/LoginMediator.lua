@@ -1,5 +1,5 @@
 
-local LoginMediator = class("LoginMediator", FILE.Mediator)
+local LoginMediator = class("LoginMediator", FILE.BaseMediator)
 
 function LoginMediator:onRegister()
 

@@ -17,6 +17,7 @@ function LoadSceneCommand:execute(notification)
     local function onEnter(eventName, view)
         Event:removeTargetEventListenerByType(toScene, EventCfg.SCENE_ENTER)
         local mediator = context.mediatorClass:create( view)
+        mediator:setContextData(context.data)
         self.facade:registerMediator(mediator)
         --去加所有Layer
         self:sendNotification(AppCfg.LOAD_LAYERS, {

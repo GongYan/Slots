@@ -14,6 +14,7 @@ FILE.Facade = require("script.framework.puremvc.patterns.facade.Facade")
 --base
 FILE.BaseScene = require("script.framework.base.BaseScene")
 FILE.BaseLayer = require("script.framework.base.BaseLayer")
+FILE.BaseMediator = require("script.framework.base.BaseMediator")
 
 FILE.Event = require("script.framework.event.Event")
 --scene manager 

@@ -30,6 +30,7 @@ function BaseLayer:onExitTransitionStart()
 end
 
 function BaseLayer:onExit()
+	Event:dispatchEvent(EventCfg.LAYER_EXIT, self)
 end
 
 function BaseLayer:cleanUp()

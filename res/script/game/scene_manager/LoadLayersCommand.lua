@@ -39,10 +39,10 @@ function LoadLayersCommand:execute(notification)
 
     local parentContext = data.parentContext
     if parentContext ~= nil then
-        -- if parentContext:getContextByMediator(context.mediator) then
-        --     Utils.log("Mediator already exist: " .. context.mediator.__cname)
-        --     return
-        -- end
+        if self.facade:retrieveMediator(context.mediatorClass.__cname) then
+            Utils.log("Mediator already exist: " .. context.mediator.__cname)
+            return
+        end
 
         table.insert(open, context)
         parentContext:addChild(context)
