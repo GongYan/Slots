@@ -14,7 +14,7 @@ function LoadSceneCommand:execute(notification)
 
     local contextProxy = self.facade:retrieveProxy("ContextProxy")
     local toScene = context.viewClass:create()
-    local enterEventName = (string.format("%s_%s",context.viewClass.DID_ENTER, context.viewClass.__cname)
+    local enterEventName = string.format("%s_%s",context.viewClass.DID_ENTER, context.viewClass.__cname)
     local function onEnter()
         Event:removeTargetEventListenerByType(toScene, enterEventName)
         local mediator = context.mediatorClass:create( toScene)

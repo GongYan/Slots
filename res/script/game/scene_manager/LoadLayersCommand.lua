@@ -20,7 +20,7 @@ function LoadLayersCommand:execute(notification)
             local parentViewComponent = parentMediator:getViewComponent()
 
             local viewComponent = context.viewClass:create()
-            local enterEventName = (string.format("%s_%s",context.viewClass.DID_ENTER, context.viewClass.__cname)
+            local enterEventName = string.format("%s_%s",context.viewClass.DID_ENTER, context.viewClass.__cname)
             local finish = false
             local function onFinish()
                 Event:removeTargetEventListenerByType(viewComponent, enterEventName)
