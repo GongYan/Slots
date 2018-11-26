@@ -17,7 +17,8 @@ end
 function AppFacade:startUp()
 	self:sendNotification(AppFacade.STARTUP)
 	self:removeCommand(AppFacade.STARTUP)
-	self:sendNotification(AppCfg.GO_TO_SCENE, {}, SceneCfg.LOGIN ) --去登陆场景
+	local context = FILE.Context:create({mediatorClass = FILE.LoginMediator, viewClass = FILE.LoginScene })
+	self:sendNotification(AppCfg.LOAD_SCENE, {context = context} ) --去登陆场景
 end
 
 

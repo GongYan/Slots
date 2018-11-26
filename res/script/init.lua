@@ -5,7 +5,6 @@ cc.exports.MsgCfg = require("script.config.MsgCfg")
 cc.exports.AppCfg = require("script.config.AppCfg")
 cc.exports.FILE = {}
 require("script.config.FileCfg")
-cc.exports.SceneCfg = require("script.config.SceneCfg")
 
 --framework
 cc.exports.Utils = require("script.util.Utils")

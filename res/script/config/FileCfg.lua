@@ -25,7 +25,6 @@ FILE.LoadLayersCommand = require("script.game.scene_manager.LoadLayersCommand")
 FILE.LoadSceneCommand = require("script.game.scene_manager.LoadSceneCommand")
 FILE.RemoveLayersCommand = require("script.game.scene_manager.RemoveLayersCommand")
 FILE.BackSceneCommand = require("script.game.scene_manager.BackSceneCommand")
-FILE.GameMediator = require("script.game.scene_manager.GameMediator")
 
 --bootstrap
 FILE.BootstrapController = require("script.game.bootstrap.BootstrapController")
