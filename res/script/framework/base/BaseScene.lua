@@ -1,5 +1,5 @@
 
-local BaseScene = class("BaseScene", cc.Scene)
+local BaseScene = class("BaseScene", cc.Scene, FILE.BaseView)
 BaseScene.DID_ENTER = "DID_ENTER"
 
 function BaseScene:ctor()
@@ -9,6 +9,7 @@ end
 function BaseScene:onNodeEvent(eventName)
 	if "enter" == eventName then
 		self:onEnter()
+		Event:dispatchEvent((string.format("%s_%s",BaseScene.DID_ENTER, self.__cname)))
 	elseif "enterTransitionFinish" == eventName then
 		self:onEnterTransitionFinish()
 	elseif "exitTransitionStart" == eventName then
@@ -21,7 +22,6 @@ function BaseScene:onNodeEvent(eventName)
 end
 
 function BaseScene:onEnter()
-	Event:dispatchEvent((string.format("%s_%s",BaseScene.DID_ENTER, self.__cname) ))
 end
 
 function BaseScene:onEnterTransitionFinish()

@@ -18,8 +18,24 @@ local M = GameClient
 -- 	-- end
 -- end
 
+local setDesignResolution = function ()
+	local framesize = cc.Director:getInstance():getOpenGLView():getFrameSize()
+    local autoscale = cc.ResolutionPolicy.FIXED_WIDTH
+	local ratio = framesize.width / framesize.height
+	if ratio <= 1.34 then
+		-- iPad 768*1024(1536*2048) is 4:3 screen
+		autoscale = cc.ResolutionPolicy.FIXED_WIDTH
+	elseif ratio >= 1.78 then
+		autoscale = cc.ResolutionPolicy.FIXED_HEIGHT
+	end
+	
+	-- 模块内用模块内的适配策略
+	cc.Director:getInstance():getOpenGLView():setDesignResolutionSize(1280, 720, autoscale)
+end
+
 --game client start...
 function M:start()
+	setDesignResolution()
 	require("script.init")
 	AppFacade:startUp() --统一由mvc框架管理游戏内所有
 end

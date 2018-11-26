@@ -1,0 +1,19 @@
+<Solution>
+  <PropertyGroup Name="slot" Version="3.10.0.0" Type="CocosStudio" />
+  <SolutionFolder>
+    <Group ctype="ResourceGroup">
+      <RootFolder Name=".">
+        <Folder Name="loading">
+          <Image Name="slot_loding_circle.png" />
+        </Folder>
+        <Folder Name="combg">
+          <Image Name="slot_loding_bg.png" />
+        </Folder>
+        <Folder Name="login">
+          <Image Name="slot_btn_login_visit.png" />
+          <Project Name="LoginLayer.csd" Type="Layer" />
+        </Folder>
+      </RootFolder>
+    </Group>
+  </SolutionFolder>
+</Solution>

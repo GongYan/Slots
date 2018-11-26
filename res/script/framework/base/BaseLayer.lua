@@ -1,5 +1,5 @@
 
-local BaseLayer = class("BaseLayer", cc.Layer)
+local BaseLayer = class("BaseLayer", cc.Layer, FILE.BaseView)
 BaseLayer.DID_ENTER = "DID_ENTER"
 BaseLayer.DID_EXIT = "DID_EXIT"
 
@@ -10,19 +10,20 @@ end
 function BaseLayer:onNodeEvent(eventName)
 	if "enter" == eventName then
 		self:onEnter()
+		Event:dispatchEvent((string.format("%s_%s",BaseLayer.DID_ENTER, self.__cname)))
 	elseif "enterTransitionFinish" == eventName then
 		self:onEnterTransitionFinish()
 	elseif "exitTransitionStart" == eventName then
 		self:onExitTransitionStart()
 	elseif "exit" == eventName then
 		self:onExit()
+		Event:dispatchEvent((string.format("%s_%s",BaseLayer.DID_EXIT, self.__cname)))
 	elseif "cleanup" == eventName then
 		self:cleanUp()
 	end
 end
 
 function BaseLayer:onEnter()
-	Event:dispatchEvent((string.format("%s_%s",BaseLayer.DID_ENTER, self.__cname) ))
 end
 
 function BaseLayer:onEnterTransitionFinish()
@@ -32,7 +33,6 @@ function BaseLayer:onExitTransitionStart()
 end
 
 function BaseLayer:onExit()
-	Event:dispatchEvent((string.format("%s_%s",BaseLayer.DID_EXIT, self.__cname) ))
 end
 
 function BaseLayer:cleanUp()

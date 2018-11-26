@@ -12,6 +12,7 @@ FILE.MacroCommand = require("script.framework.puremvc.patterns.command.MacroComm
 FILE.SimpleCommand = require("script.framework.puremvc.patterns.command.SimpleCommand")
 FILE.Facade = require("script.framework.puremvc.patterns.facade.Facade")
 --base
+FILE.BaseView = require("script.framework.base.BaseView")
 FILE.BaseScene = require("script.framework.base.BaseScene")
 FILE.BaseLayer = require("script.framework.base.BaseLayer")
 FILE.BaseMediator = require("script.framework.base.BaseMediator")

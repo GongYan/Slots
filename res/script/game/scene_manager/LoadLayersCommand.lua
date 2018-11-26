@@ -41,7 +41,7 @@ function LoadLayersCommand:execute(notification)
     local parentContext = data.parentContext
     if parentContext ~= nil then
         if self.facade:retrieveMediator(context.mediatorClass.__cname) then
-            Utils.log("Mediator already exist: " .. context.mediator.__cname)
+            Tools.log("Mediator already exist: " .. context.mediator.__cname)
             return
         end
 

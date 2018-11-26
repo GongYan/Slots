@@ -20,4 +20,22 @@ function BaseMediator:addSubLayers( context )
     })
 end
 
+
+-- start --
+--------------------------------
+-- @class function
+-- @description 给BUTTON注册触屏事件
+-- @param btn 注册按钮
+-- @param listener 注册事件回调
+-- end --
+function BaseMediator:addBtnPressedListener(btn, listener)
+	if not btn or not listener then
+		return
+	end
+
+	btn:addClickEventListener(function(sender)
+		listener(sender)
+	end)
+end
+
 return BaseMediator

@@ -11,9 +11,9 @@ function Context:ctor(data)
 end
 
 function Context:addChild(context)
-	if not context then Utils.log("Context:addChild context is nil") end
+	if not context then Tools.log("Context:addChild context is nil") end
 	if context.parent ~= nil then
-		Utils.log("context already has parent")
+		Tools.log("context already has parent")
 		return
 	end
 	context.parent = self
@@ -21,7 +21,7 @@ function Context:addChild(context)
 end
 
 function Context:removeChild(context)
-	if not context then Utils.log("Context:removeChild context is nil") end
+	if not context then Tools.log("Context:removeChild context is nil") end
 	for i, v in ipairs(self.children) do
 		if v == context then
 			context.parent = nil

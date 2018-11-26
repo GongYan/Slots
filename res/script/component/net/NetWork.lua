@@ -49,7 +49,7 @@ function M:connect(ip, port, isBlock)
 	self.port = port
 	local socket, errorInfo = socket.tcp()
 	if not socket then
-		Utils.log(string.format("Connect failed when create socket | %s", errorInfo))
+		Tools.log(string.format("Connect failed when create socket | %s", errorInfo))
 		return false
 	end
 	self.socket = socket
@@ -59,11 +59,11 @@ function M:connect(ip, port, isBlock)
 
 	if connectCode == 1 then
 		self.socket:settimeout(isBlock and 8 or 0) 					--非阻塞
-		Utils.log("socket connect success!" .. connectCode)
+		Tools.log("socket connect success!" .. connectCode)
 		self:createScheduler()
 		return true
 	else
-		Utils.log(string.format("socket %s connect failed | %s", (isBlock and "Blocked" or ""), errorInfo) )
+		Tools.log(string.format("socket %s connect failed | %s", (isBlock and "Blocked" or ""), errorInfo) )
 		return false
 	end
 end
@@ -106,10 +106,10 @@ function M:isConnected()
 	local readyForWrite, _;
 	_, readyForWrite,_ = socket.select(nil, forWrite, 0)
 	if #readyForWrite > 0 then
-		Utils.log(string.format("ready for write |  %s",#readyForWrite))
+		Tools.log(string.format("ready for write |  %s",#readyForWrite))
 		return true
 	end
-	Utils.log("no ready for write")
+	Tools.log("no ready for write")
 	return false
 end
 
@@ -123,7 +123,7 @@ function M:processSocketIO(delta)
 			
 			--登陆服务器后开始发送心跳消息
 			self.heartbeatCD = self.heartbeatCD - delta
-			Utils.log("heartbeatCD->" .. self.heartbeatCD)
+			Tools.log("heartbeatCD->" .. self.heartbeatCD)
 			if self.heartbeatCD < 0 then
 				-- 发送心跳
 				self:sendHeartbeat(true)
@@ -132,7 +132,7 @@ function M:processSocketIO(delta)
 			--心跳回复时间间隔
 			self.curReplayInterval = self.curReplayInterval + delta
 			if self.isCheckNet and self.curReplayInterval >= self.resumeHeartbeatTime then
-				Utils.log("断线重连超时，重新登陆")
+				Tools.log("断线重连超时，重新登陆")
 				self.isCheckNet = false
 				self.heartbeatCD = self.heatTime
 				--心跳回复超时发送重新登录消息
@@ -163,7 +163,7 @@ function M:onRcvHeartbeat(msgTbl)
 	self.lastReplayInterval = self.curReplayInterval
 	self.heartbeatCD = self.heatTime
 
-	Utils.log("Receive Heartbead")
+	Tools.log("Receive Heartbead")
 end
 
 function M:reloginServer()
@@ -179,7 +179,7 @@ function M:reloginServer()
 end
 
 function M:relogin()
-	Utils.log("relogin")
+	Tools.log("relogin")
 
 end
 
@@ -218,7 +218,7 @@ function M:send(msgName, msgBody)
 	local bodyPack = string.pack(">P", pbBody)
 	local msgLen = string.len(headPack) + string.len(bodyPack)
 	local lenPack = string.pack(">H", msgLen)
-	Utils.log("GameNet send msg:"..msgName .. ": headPackLen:" .. #headPack .. ": bodyPackLen: " .. #bodyPack)
+	Tools.log("GameNet send msg:"..msgName .. ": headPackLen:" .. #headPack .. ": bodyPackLen: " .. #bodyPack)
 	local data = lenPack .. headPack ..bodyPack
 	table.insert(self.sendTaskList, 1, data)
 end
@@ -234,11 +234,11 @@ function M:receiveMessage(messageQueue)
 			if otherContent ~= nil and #otherContent > 0 then
 				self.recvingBuffer = self.recvingBuffer .. otherContent
 				self.remainRecvSize = self.remainRecvSize - #otherContent
-				Utils.log("recv timeout, but had other content. size:" .. #otherContent)
+				Tools.log("recv timeout, but had other content. size:" .. #otherContent)
 			end
 			return true
 		else --发生错误，这个点可以考虑重连了，不用等待heartbeat
-			Utils.log("recv failed errorinf: " .. errorInfo)
+			Tools.log("recv failed errorinf: " .. errorInfo)
 			return false
 		end
 	end
@@ -263,9 +263,9 @@ function M:receiveMessage(messageQueue)
 		local msgBody = protobuf.decode(msgHead.msgname, pbBody)
 		table.insert(messageQueue, msgBody)
 
-		Utils.log("收到服务器数据", msgHead.msgname)
+		Tools.log("收到服务器数据", msgHead.msgname)
 		dump(msgBody, "msgBody")
-		Utils.log("---------end------------")
+		Tools.log("---------end------------")
 
 		self.remainRecvSize = self.msgSize
 		self.recvingBuffer = ""
@@ -279,7 +279,7 @@ end
 function M:processInput()
 	--检测是否有可读的socket
 	local recvt, sendt, status = socket.select({self.socket}, nil, 1)
-	Utils.log("input select", #recvt, sendt, status)
+	Tools.log("input select", #recvt, sendt, status)
 	if #recvt <= 0 then
 		return
 	end
@@ -306,7 +306,7 @@ function M:processOutput()
 		local data = self.sendTaskList[#self.sendTaskList]
 		if data then
 			local _len, _error = self.socket:send(data)
-			Utils.log("socket send"..#data, "_len:", _len, "error:", _error)
+			Tools.log("socket send"..#data, "_len:", _len, "error:", _error)
 			--发送长度不为空， 并且发送长度==数据长度
 			if _len and _len == #data then
 				table.remove(self.sendTaskList, #self.sendTaskList)
@@ -332,7 +332,7 @@ end
 function M:dispatchMessage(msgTbl)
 
 	if self.rcvMsgListeners[msgTbl.user_id] == nil then
-		Utils.log("Could not handle Message " .. msgTbl.user_id)
+		Tools.log("Could not handle Message " .. msgTbl.user_id)
 		return
 	end
 
@@ -373,7 +373,7 @@ end
 -- end --
 function M:unregisterMsgListener(msgname, slot)
 	if self.rcvMsgListeners[msgname] == nil then
-		Utils.log("unregisterMsgListener -> this message is no found")
+		Tools.log("unregisterMsgListener -> this message is no found")
 		return
 	end
 

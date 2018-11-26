@@ -2,14 +2,12 @@
 local LoginMediator = class("LoginMediator", FILE.BaseMediator)
 
 function LoginMediator:onRegister()
+	self:addBtnPressedListener(self.viewComponent.Btn_vist, handler(self, self.onClickVist))
+end
 
-	Event:registerEventListener(EventCfg.ON_LOGIN, self.viewComponent, function(eventType, data )
-		self:sendNotification(AppCfg.LOGIN ,data)
-	end )
-
-	Event:registerEventListener(EventCfg.ON_SERVER, self.viewComponent, function(eventType, data )
-		self:sendNotification(AppCfg.LOGIN ,data)
-	end )
+function LoginMediator:onClickVist()
+	self:sendNotification(AppCfg.LOGIN ,data)
+	Tools.log("onClickVist")
 end
 
 function LoginMediator:onRemove()

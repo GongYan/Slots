@@ -4,11 +4,11 @@ function LoadSceneCommand:execute(notification)
     local body = notification:getBody()
     local context = body.context
     if not context.viewClass then
-        Utils.log("LoadSceneCommand.execute-> context.viewClass is nil")
+        Tools.log("LoadSceneCommand.execute-> context.viewClass is nil")
         return 
     end
     if not context.mediatorClass then
-        Utils.log("LoadSceneCommand.execute-> context.mediatorClass is nil")
+        Tools.log("LoadSceneCommand.execute-> context.mediatorClass is nil")
         return 
     end
 
@@ -16,6 +16,7 @@ function LoadSceneCommand:execute(notification)
     local toScene = context.viewClass:create()
     local enterEventName = string.format("%s_%s",context.viewClass.DID_ENTER, context.viewClass.__cname)
     local function onEnter()
+        print("LoginMediator:onRegister onEnter")
         Event:removeTargetEventListenerByType(toScene, enterEventName)
         local mediator = context.mediatorClass:create( toScene)
         mediator:setContextData(context.data)
