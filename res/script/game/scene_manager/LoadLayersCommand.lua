@@ -20,16 +20,17 @@ function LoadLayersCommand:execute(notification)
             local parentViewComponent = parentMediator:getViewComponent()
 
             local viewComponent = context.viewClass:create()
+            local enterEventName = (string.format("%s_%s",context.viewClass.DID_ENTER, context.viewClass.__cname)
             local finish = false
             local function onFinish()
-                Event:removeTargetEventListenerByType(viewComponent, EventCfg.LAYER_ENTER)
+                Event:removeTargetEventListenerByType(viewComponent, enterEventName)
                 local mediator = context.mediatorClass:create(viewComponent)
                 mediator:setContextData(context.data)
                 self.facade:registerMediator(mediator)
                 coroutine.resume(restoreLayers)
                 finish = true
             end
-            Event:registerEventListener(EventCfg.LAYER_ENTER, viewComponent, onFinish)
+            Event:registerEventListener(enterEventName, viewComponent, onFinish)
             parentViewComponent:addChild(viewComponent)
             if not finish then coroutine.yield() end
         end

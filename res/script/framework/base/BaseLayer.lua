@@ -1,5 +1,7 @@
 
 local BaseLayer = class("BaseLayer", cc.Layer)
+BaseLayer.DID_ENTER = "DID_ENTER"
+BaseLayer.DID_EXIT = "DID_EXIT"
 
 function BaseLayer:ctor()
     self:registerScriptHandler(handler(self, self.onNodeEvent))		
@@ -20,7 +22,7 @@ function BaseLayer:onNodeEvent(eventName)
 end
 
 function BaseLayer:onEnter()
-	Event:dispatchEvent(EventCfg.LAYER_ENTER, self)
+	Event:dispatchEvent((string.format("%s_%s",BaseLayer.DID_ENTER, self.__cname) ))
 end
 
 function BaseLayer:onEnterTransitionFinish()
@@ -30,7 +32,7 @@ function BaseLayer:onExitTransitionStart()
 end
 
 function BaseLayer:onExit()
-	Event:dispatchEvent(EventCfg.LAYER_EXIT, self)
+	Event:dispatchEvent((string.format("%s_%s",BaseLayer.DID_EXIT, self.__cname) ))
 end
 
 function BaseLayer:cleanUp()

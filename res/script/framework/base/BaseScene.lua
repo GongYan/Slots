@@ -1,5 +1,6 @@
 
 local BaseScene = class("BaseScene", cc.Scene)
+BaseScene.DID_ENTER = "DID_ENTER"
 
 function BaseScene:ctor()
     self:registerScriptHandler(handler(self, self.onNodeEvent))		
@@ -20,7 +21,7 @@ function BaseScene:onNodeEvent(eventName)
 end
 
 function BaseScene:onEnter()
-	Event:dispatchEvent(EventCfg.SCENE_ENTER, self)
+	Event:dispatchEvent((string.format("%s_%s",BaseScene.DID_ENTER, self.__cname) ))
 end
 
 function BaseScene:onEnterTransitionFinish()

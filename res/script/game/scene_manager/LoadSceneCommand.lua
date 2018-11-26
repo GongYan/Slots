@@ -14,9 +14,10 @@ function LoadSceneCommand:execute(notification)
 
     local contextProxy = self.facade:retrieveProxy("ContextProxy")
     local toScene = context.viewClass:create()
-    local function onEnter(eventName, view)
-        Event:removeTargetEventListenerByType(toScene, EventCfg.SCENE_ENTER)
-        local mediator = context.mediatorClass:create( view)
+    local enterEventName = (string.format("%s_%s",context.viewClass.DID_ENTER, context.viewClass.__cname)
+    local function onEnter()
+        Event:removeTargetEventListenerByType(toScene, enterEventName)
+        local mediator = context.mediatorClass:create( toScene)
         mediator:setContextData(context.data)
         self.facade:registerMediator(mediator)
         --去加所有Layer
@@ -24,7 +25,7 @@ function LoadSceneCommand:execute(notification)
             context = context
         })
     end
-    Event:registerEventListener(EventCfg.SCENE_ENTER, toScene, onEnter)
+    Event:registerEventListener(enterEventName, toScene, onEnter)
 
     local function nextScene()
         if context.cleanStack then
