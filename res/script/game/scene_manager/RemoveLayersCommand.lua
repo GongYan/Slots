@@ -27,13 +27,13 @@ function RemoveLayersCommand:execute(note)
             local subMediator = self.facade:removeMediator(context.mediatorClass.__cname)
             local viewComponent = subMediator:getViewComponent()
             local removed = false
-            local enterEventName = (string.format("%s_%s",context.viewClass.DID_ENTER, context.viewClass.__cname)
+            local exitEventName = (string.format("%s_%s",context.viewClass.DID_EXIT, context.viewClass.__cname)
             local function onRemoved()
-                Event:removeTargetEventListenerByType(viewComponent, enterEventName)
+                Event:removeTargetEventListenerByType(viewComponent, exitEventName)
                 coroutine.resume(removeState)
                 removed = true
             end
-            Event:registerEventListener(enterEventName, viewComponent, onRemoved)
+            Event:registerEventListener(exitEventName, viewComponent, onRemoved)
             viewComponent:removeFromParent()
             if not removed then coroutine.yield() end
         end
